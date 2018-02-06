@@ -15,6 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
     cv_bridge
     roscpp_serialization
     rospy
+    OpenCV REQUIRED
   )
 
 include(FindPkgConfig)

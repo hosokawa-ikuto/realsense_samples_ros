@@ -1,0 +1,103 @@
+<launch>
+  <arg name="manager"             default="realsense_ros_camera_manager"/>
+
+  <!-- R200 -->
+  <arg name="serial_no"           default="2511002300" />
+  <arg name="camera"              default="camera"/>
+  <arg name="depth"               default="depth" />
+  <arg name="rgb"                 default="color" />
+  <arg name="depth_width"         default="320" />
+  <arg name="depth_height"        default="240" />
+  <arg name="enable_depth"        default="true" />
+<!--
+  <arg name="color_width"         default="640" />
+  <arg name="color_height"        default="480" />
+-->
+  <arg name="color_width"         default="1920" />
+  <arg name="color_height"        default="1080" />
+  <arg name="enable_color"        default="true" />
+  <arg name="depth_fps"           default="30" />
+  <arg name="color_fps"           default="30" />
+
+
+  <!-- ZR300 -->
+  <arg name="zserial_no"           default="3511805326" />
+  <arg name="zcamera"              default="zcamera"/>
+  <arg name="zdepth"               default="depth" />
+  <arg name="zrgb"                 default="color" />
+  <arg name="zfisheye"             default="fisheye" />
+  <arg name="zaccel"               default="accel" />
+  <arg name="zgyro"                default="gyro" />
+  <arg name="zfisheye_width"       default="640" />
+  <arg name="zfisheye_height"      default="480" />
+  <arg name="zenable_fisheye"      default="false" />
+  <arg name="zdepth_width"         default="320" />
+  <arg name="zdepth_height"        default="240" />
+  <arg name="zenable_depth"        default="true" />
+<!--
+  <arg name="zcolor_width"         default="640" />
+  <arg name="zcolor_height"        default="480" />
+-->
+  <arg name="zcolor_width"         default="1920" />
+  <arg name="zcolor_height"        default="1080" />
+  <arg name="zenable_color"        default="true" />
+  <arg name="zfisheye_fps"         default="30" />
+  <arg name="zdepth_fps"           default="30" />
+  <arg name="zcolor_fps"           default="30" />
+
+  <node pkg="nodelet" type="nodelet" name="$(arg manager)" args="manager" output="screen"/> 
+
+  <node pkg="nodelet" type="nodelet" name="realsense_ros_$(arg camera)" args="load realsense_ros_camera/NodeletCamera /$(arg manager) --no-bond" output="screen">
+    <param name="serial_no"                type="str"  value="$(arg serial_no)" />
+    
+    <param name="depth_width"              type="int"  value="$(arg depth_width)" />
+    <param name="depth_height"             type="int"  value="$(arg depth_height)" />
+    <param name="enable_depth"             type="bool" value="$(arg enable_depth)" />
+    <param name="color_width"              type="int"  value="$(arg color_width)" />
+    <param name="color_height"             type="int"  value="$(arg color_height)" />
+    <param name="enable_color"             type="bool" value="$(arg enable_color)" />
+    <param name="depth_fps"                type="int"  value="$(arg depth_fps)" />
+    <param name="color_fps"                type="int"  value="$(arg color_fps)" />
+
+    <param name="depth_optical_frame_id"   type="str"  value="$(arg camera)_depth_optical_frame" />
+    <param name="color_optical_frame_id"   type="str"  value="$(arg camera)_rgb_optical_frame" />
+    <param name="ir_optical_frame_id"      type="str"  value="$(arg camera)_ir_optical_frame" />
+    <param name="ir2_optical_frame_id"     type="str"  value="$(arg camera)_ir2_optical_frame" />
+  </node>
+
+  <group ns="zr300">
+  <node pkg="nodelet" type="nodelet" name="realsense_ros_$(arg zcamera)" args="load realsense_ros_camera/NodeletCamera /$(arg manager) --no-bond" output="screen">
+<!--
+    <remap from="/camera/color/camera_info" to="/zr300/camera/color/camera_info"/>
+    <remap from="/camera/depth/camera_info" to="/zr300/camera/depth/camera_info"/>
+    <remap from="/zr300/camera/color/camera_info" to="/camera/color/camera_info"/>
+    <remap from="/zr300/camera/depth/camera_info" to="/camera/depth/camera_info"/>
+-->
+    <param name="serial_no"                type="str"  value="$(arg zserial_no)" />
+    
+    <param name="fisheye_width"            type="int"  value="$(arg zfisheye_width)" />
+    <param name="fisheye_height"           type="int"  value="$(arg zfisheye_height)" />
+    <param name="enable_fisheye"           type="bool" value="$(arg zenable_fisheye)" />
+    <param name="depth_width"              type="int"  value="$(arg zdepth_width)" />
+    <param name="depth_height"             type="int"  value="$(arg zdepth_height)" />
+    <param name="enable_depth"             type="bool" value="$(arg zenable_depth)" />
+    <param name="color_width"              type="int"  value="$(arg zcolor_width)" />
+    <param name="color_height"             type="int"  value="$(arg zcolor_height)" />
+    <param name="enable_color"             type="bool" value="$(arg zenable_color)" />
+    <param name="fisheye_fps"              type="int"  value="$(arg zfisheye_fps)" />
+    <param name="depth_fps"                type="int"  value="$(arg zdepth_fps)" />
+    <param name="color_fps"                type="int"  value="$(arg zcolor_fps)" />
+
+    <param name="base_frame_id"            type="str"  value="$(arg zcamera)_link" />
+    <param name="color_frame_id"             type="str"  value="$(arg zcamera)_rgb_frame" />
+    <param name="depth_frame_id"           type="str"  value="$(arg zcamera)_depth_frame" />
+    <param name="depth_optical_frame_id"   type="str"  value="$(arg zcamera)_depth_optical_frame" />
+    <param name="color_optical_frame_id"   type="str"  value="$(arg zcamera)_rgb_optical_frame" />
+    <param name="ir_optical_frame_id"      type="str"  value="$(arg zcamera)_ir_optical_frame" />
+    <param name="ir2_optical_frame_id"     type="str"  value="$(arg zcamera)_ir2_optical_frame" />
+    <param name="fisheye_optical_frame_id" type="str"  value="$(arg zcamera)_fisheye_optical_frame" />
+    <param name="accel_optical_frame_id"   type="str"  value="$(arg zcamera)_accel_optical_frame" />
+    <param name="gyro_optical_frame_id"    type="str"  value="$(arg zcamera)_gyro_optical_frame" />
+  </node>
+  </group>
+</launch>
