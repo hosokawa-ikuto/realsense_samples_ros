@@ -2,7 +2,7 @@
   <arg name="manager"             default="realsense_ros_camera_manager"/>
 
   <!-- R200 -->
-  <arg name="serial_no"           default="2511002300" />
+  <arg name="serial_no"           default="" />
   <arg name="camera"              default="camera"/>
   <arg name="depth"               default="depth" />
   <arg name="rgb"                 default="color" />
@@ -21,7 +21,7 @@
 
 
   <!-- ZR300 -->
-  <arg name="zserial_no"           default="3511805326" />
+  <arg name="zserial_no"           default="" />
   <arg name="zcamera"              default="zcamera"/>
   <arg name="zdepth"               default="depth" />
   <arg name="zrgb"                 default="color" />
