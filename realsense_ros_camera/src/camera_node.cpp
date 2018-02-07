@@ -185,26 +185,23 @@ private:
   void setupPublishers()
   {
     image_transport::ImageTransport image_transport(getNodeHandle());
-    ros::NodeHandle nh_ = getNodeHandle();
+    node_handle = getNodeHandle();
 
     // Stream publishers and latched topics
     if (true == enable_[rs::stream::color])
     {
       image_publishers_[rs::stream::color] = image_transport.advertise("camera/color/image_raw", 1);
       info_publisher_[rs::stream::color] = 
-        nh_.advertise< sensor_msgs::CameraInfo >("camera/color/camera_info", 1);
-        //node_handle.advertise< sensor_msgs::CameraInfo >("camera/color/camera_info", 1);
+        node_handle.advertise< sensor_msgs::CameraInfo >("camera/color/camera_info", 1);
     }
 
     if (true == enable_[rs::stream::depth])
     {
       image_publishers_[rs::stream::depth] = image_transport.advertise("camera/depth/image_raw", 1);
       info_publisher_[rs::stream::depth] = 
-        nh_.advertise< sensor_msgs::CameraInfo >("camera/depth/camera_info", 1);
-        //node_handle.advertise< sensor_msgs::CameraInfo >("camera/depth/camera_info", 1);
+        node_handle.advertise< sensor_msgs::CameraInfo >("camera/depth/camera_info", 1);
     
-      pointcloud_publisher_ = nh_.advertise<sensor_msgs::PointCloud2>("camera/points", 1);
-      //pointcloud_publisher_ = node_handle.advertise<sensor_msgs::PointCloud2>("camera/points", 1);
+      pointcloud_publisher_ = node_handle.advertise<sensor_msgs::PointCloud2>("camera/points", 1);
     }
 
     if (isZR300_)
@@ -212,23 +209,16 @@ private:
       // Stream publishers
       image_publishers_[rs::stream::fisheye] = image_transport.advertise("camera/fisheye/image_raw", 1);
       info_publisher_[rs::stream::fisheye] = 
-        nh_.advertise< sensor_msgs::CameraInfo >("camera/fisheye/camera_info", 1);
-        //node_handle.advertise< sensor_msgs::CameraInfo >("camera/fisheye/camera_info", 1);
+        node_handle.advertise< sensor_msgs::CameraInfo >("camera/fisheye/camera_info", 1);
 
-      imu_publishers_[RS_EVENT_IMU_GYRO] = nh_.advertise< sensor_msgs::Imu >("camera/gyro/sample", 100); 
-      imu_publishers_[RS_EVENT_IMU_ACCEL] = nh_.advertise< sensor_msgs::Imu >("camera/accel/sample", 100);
-      //imu_publishers_[RS_EVENT_IMU_GYRO] = node_handle.advertise< sensor_msgs::Imu >("camera/gyro/sample", 100); 
-      //imu_publishers_[RS_EVENT_IMU_ACCEL] = node_handle.advertise< sensor_msgs::Imu >("camera/accel/sample", 100);
+      imu_publishers_[RS_EVENT_IMU_GYRO] = node_handle.advertise< sensor_msgs::Imu >("camera/gyro/sample", 100); 
+      imu_publishers_[RS_EVENT_IMU_ACCEL] = node_handle.advertise< sensor_msgs::Imu >("camera/accel/sample", 100);
 
       // Latched topics
-      fe2imu_publisher_ = nh_.advertise< Extrinsics >("camera/extrinsics/fisheye2imu", 1, true);
-      fe2depth_publisher_ = nh_.advertise< Extrinsics >("camera/extrinsics/fisheye2depth", 1, true);
-      accelInfo_publisher_ = nh_.advertise< IMUInfo >("camera/accel/imu_info", 1, true);
-      gyroInfo_publisher_ = nh_.advertise< IMUInfo >("camera/gyro/imu_info", 1, true);
-      //fe2imu_publisher_ = node_handle.advertise< Extrinsics >("camera/extrinsics/fisheye2imu", 1, true);
-      //fe2depth_publisher_ = node_handle.advertise< Extrinsics >("camera/extrinsics/fisheye2depth", 1, true);
-      //accelInfo_publisher_ = node_handle.advertise< IMUInfo >("camera/accel/imu_info", 1, true);
-      //gyroInfo_publisher_ = node_handle.advertise< IMUInfo >("camera/gyro/imu_info", 1, true);
+      fe2imu_publisher_ = node_handle.advertise< Extrinsics >("camera/extrinsics/fisheye2imu", 1, true);
+      fe2depth_publisher_ = node_handle.advertise< Extrinsics >("camera/extrinsics/fisheye2depth", 1, true);
+      accelInfo_publisher_ = node_handle.advertise< IMUInfo >("camera/accel/imu_info", 1, true);
+      gyroInfo_publisher_ = node_handle.advertise< IMUInfo >("camera/gyro/imu_info", 1, true);
     }
   }//end setupPublishers
 
@@ -471,6 +461,16 @@ private:
 
   void publishStaticTransforms()
   {
+
+    static std::vector<geometry_msgs::TransformStamped> b2d_msgs;
+    static std::vector<geometry_msgs::TransformStamped> d2do_msgs;
+    static std::vector<geometry_msgs::TransformStamped> b2c_msgs;
+    static std::vector<geometry_msgs::TransformStamped> c2co_msgs;
+    static std::vector<geometry_msgs::TransformStamped> b2i_msgs;
+    static std::vector<geometry_msgs::TransformStamped> i2io_msgs;
+
+    //ROS_INFO_STREAM("  base_frame_id_: " << base_frame_id_);
+
     // Publish transforms for the cameras
     tf::Quaternion q_c2co;
     tf::Quaternion q_d2do;
@@ -497,7 +497,9 @@ private:
     b2c_msg.transform.rotation.y = 0;
     b2c_msg.transform.rotation.z = 0;
     b2c_msg.transform.rotation.w = 1;
-    static_tf_broadcaster_.sendTransform(b2c_msg);
+    b2c_msgs.push_back(b2c_msg);
+    //ROS_INFO_STREAM("  b2c_msg: " << b2c_msgs.back());
+    static_tf_broadcaster_.sendTransform(b2c_msgs);
 
     // Transform color frame to color optical frame
     q_c2co.setRPY(-M_PI / 2, 0.0, -M_PI / 2);
@@ -511,7 +513,9 @@ private:
     c2co_msg.transform.rotation.y = q_c2co.getY();
     c2co_msg.transform.rotation.z = q_c2co.getZ();
     c2co_msg.transform.rotation.w = q_c2co.getW();
-    static_tf_broadcaster_.sendTransform(c2co_msg);
+    c2co_msgs.push_back(c2co_msg);
+    //ROS_INFO_STREAM("  c2co_msg: " << c2co_msgs.back());
+    static_tf_broadcaster_.sendTransform(c2co_msgs);
 
     // Transform base frame to depth frame
     rs::extrinsics color2depth_extrinsic = device_->get_extrinsics(rs::stream::color, rs::stream::depth);
@@ -525,7 +529,9 @@ private:
     b2d_msg.transform.rotation.y = 0;
     b2d_msg.transform.rotation.z = 0;
     b2d_msg.transform.rotation.w = 1;
-    static_tf_broadcaster_.sendTransform(b2d_msg);
+    b2d_msg.transform.rotation.w = 1;
+    b2d_msgs.push_back(b2d_msg);
+    static_tf_broadcaster_.sendTransform(b2d_msgs);
 
     // Transform depth frame to depth optical frame
     q_d2do.setRPY(-M_PI / 2, 0.0, -M_PI / 2);
@@ -539,10 +545,13 @@ private:
     d2do_msg.transform.rotation.y = q_d2do.getY();
     d2do_msg.transform.rotation.z = q_d2do.getZ();
     d2do_msg.transform.rotation.w = q_d2do.getW();
-    static_tf_broadcaster_.sendTransform(d2do_msg);
+    d2do_msgs.push_back(d2do_msg);
+    static_tf_broadcaster_.sendTransform(d2do_msgs);
 
     if (isZR300_)
     {
+      static std::vector<geometry_msgs::TransformStamped> b2f_msgs;
+      static std::vector<geometry_msgs::TransformStamped> f2fo_msgs;
       tf::Quaternion q_f2fo, q_imu2imuo;
       geometry_msgs::TransformStamped b2f_msg;
       geometry_msgs::TransformStamped f2fo_msg;
@@ -561,7 +570,8 @@ private:
       b2f_msg.transform.rotation.y = 0;
       b2f_msg.transform.rotation.z = 0;
       b2f_msg.transform.rotation.w = 1;
-      static_tf_broadcaster_.sendTransform(b2f_msg);
+      b2f_msgs.push_back(b2f_msg);
+      static_tf_broadcaster_.sendTransform(b2f_msgs);
 
       // Transform fisheye frame to fisheye optical frame
       q_f2fo.setRPY(-M_PI / 2, 0.0, -M_PI / 2);
@@ -575,7 +585,8 @@ private:
       f2fo_msg.transform.rotation.y = q_f2fo.getY();
       f2fo_msg.transform.rotation.z = q_f2fo.getZ();
       f2fo_msg.transform.rotation.w = q_f2fo.getW();
-      static_tf_broadcaster_.sendTransform(f2fo_msg);
+      f2fo_msgs.push_back(f2fo_msg);
+      static_tf_broadcaster_.sendTransform(f2fo_msgs);
     }
   }
 
