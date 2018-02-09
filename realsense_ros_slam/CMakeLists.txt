@@ -109,9 +109,9 @@ install(DIRECTORY launch/
 )
 
 # Install lib files
-install(DIRECTORY lib/
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/lib
-)
+#install(DIRECTORY lib/
+#  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/lib
+#)
 # Install include files
 install(DIRECTORY include/
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/include

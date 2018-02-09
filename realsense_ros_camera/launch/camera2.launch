@@ -35,6 +35,8 @@
   <arg name="zdepth_height"        default="240" />
   <arg name="zenable_depth"        default="true" />
 <!--
+  <arg name="zcolor_width"         default="320" />
+  <arg name="zcolor_height"        default="240" />
   <arg name="zcolor_width"         default="640" />
   <arg name="zcolor_height"        default="480" />
 -->

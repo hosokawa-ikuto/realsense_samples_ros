@@ -113,9 +113,9 @@ install(TARGETS ${PROJECT_NAME}
 )
 
 # Install header files
-install(DIRECTORY include/${PROJECT_NAME}/
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-)
+#install(DIRECTORY include/${PROJECT_NAME}/
+#  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+#)
 
 # Install launch files
 install(DIRECTORY launch/
